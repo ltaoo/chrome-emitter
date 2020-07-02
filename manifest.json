@@ -1,0 +1,43 @@
+{
+    "manifest_version": 2,
+    "name": "SimpleExample",
+    "version": "0.0.1",
+    "short_name": "EasyIntercept",
+    "description": "A Interceptor easy use",
+    "homepage_url": "https://github.com/ltaoo/easy-interceptor",
+    "permissions": [
+        "webRequest",
+        "webRequestBlocking",
+        "storage",
+        "tabs",
+        "activeTab",
+        "http://*/*",
+        "<all_urls>",
+        "https://*/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ]
+        }
+    ],
+    "background": {
+        "persistent": true,
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.bootcdn.net/ https://unpkg.com/; object-src 'self'",
+    "browser_action": {
+        "default_icon": {
+            "19": "icons/icon-19.png",
+            "38": "icons/icon-38.png"
+        },
+        "default_popup": "popup.html",
+        "default_title": "Web-Monitor"
+    }
+}
