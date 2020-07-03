@@ -40,5 +40,8 @@
         },
         "default_popup": "popup.html",
         "default_title": "Web-Monitor"
-    }
+    },
+    "web_accessible_resources": [
+      "injected.js"
+    ]
 }

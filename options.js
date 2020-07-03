@@ -1,6 +1,7 @@
+console.log('here is options');
+
 document.body.onload = () => {
   const btn = document.getElementById("btn");
-
   btn.onclick = () => {
     dispatch({
       type: "update",
@@ -9,7 +10,7 @@ document.body.onload = () => {
   };
   document.getElementById("second").onclick = () => {};
 };
-
+console.log(window);
 addStoreListener((action) => {
   console.log(action);
 });

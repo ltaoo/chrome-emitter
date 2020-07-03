@@ -1,55 +1,82 @@
 console.log("here is content");
 
-/* content script send message to popup */
-// 这个实现不了吧，往往页面打开时，popup 是没有打开的，如果 background 中有监听，其实是 background 响应了这个广播
-// chrome.runtime.sendMessage(
-//   {
-//     info: "Hello popup, I am content",
-//   },
-//   (reply) => {
-//     console.log("[receive reply from popup]: ", reply);
-//   }
-// );
-
-/* receive message from popup */
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log("1.", "[receive message from popup]: ", request.msg);
-  sendResponse();
-  //   chrome.runtime.sendMessage(
-  //     {
-  //       type: "test",
-  //       info: "Hello background, I am content inner receive message from pop",
-  //     },
-  //     (reply) => {
-  //         console.log("3. [receive reply from background]: ", reply);
-  //       sendResponse(reply);
-  //     }
-  //   );
-  return true;
+/* ----- common chunk start ----- */
+const CUSTOM_EVENT_NAME = "abc";
+const SPECIAL_CUSTOM_EVENT_NAME = "abcd";
+function dispatch(action) {
+  let eventName = SPECIAL_CUSTOM_EVENT_NAME;
+  if (chrome && chrome.extension) {
+    eventName = CUSTOM_EVENT_NAME;
+  }
+  window.dispatchEvent(
+    new CustomEvent(CUSTOM_EVENT_NAME, {
+      detail: action,
+    })
+  );
+  if (chrome === undefined || chrome.storage === undefined) {
+    return;
+  }
+  chrome.storage.local.set({
+    __time__: new Date().valueOf(),
+    __data__: {
+      value: new Date().valueOf(),
+      type: action.type,
+      payload: action.payload,
+    },
+  });
+}
+window.dispatch = dispatch;
+function addStoreListener(cb) {
+  window.addEventListener(CUSTOM_EVENT_NAME, function (event) {
+    cb(event.detail);
+  });
+  if (chrome === undefined || chrome.storage === undefined) {
+    return;
+  }
+  chrome.storage.onChanged.addListener((changes) => {
+    const { __data__ } = changes;
+    const nextAction = __data__.newValue;
+    const { type, payload } = nextAction;
+    cb({
+      type,
+      payload,
+    });
+  });
+}
+window.addStoreListener = addStoreListener;
+window.addEventListener(SPECIAL_CUSTOM_EVENT_NAME, function (event) {
+  dispatch(event.detail);
 });
+/* ----- common chunk end ----- */
 
-/* send message to background */
-// console.log("send message to background when loaded");
-// chrome.runtime.sendMessage(
-//   {
-//     info: "Hello background, I am content",
-//   },
-//   (reply) => {
-//     console.log("[receive reply from background]: ", reply);
-//   }
-// );
+function loadJs(src, cb) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
 
-// const port = chrome.runtime.connect({
-//     name: "content",
-// });
-// port.onMessage.addListener((msg) => {
-//     console.log('content', "[receive message from background]: ", msg);
-// });
+    document.documentElement.appendChild(script);
 
-chrome.storage.sync.get('status', (data) => {
-    console.log(data);
+    script.onload = () => {
+      if (cb) {
+        cb(null);
+      }
+      resolve();
+    };
+    script.onerror = (error) => {
+      if (cb) {
+        cb(error, null);
+      }
+      reject();
+    };
+  });
+}
+console.log("[content script]", window.loadJs);
+loadJs(chrome.extension.getURL("injected.js"), () => {
+  dispatch({
+    type: "hello",
+    payload: "injected script",
+  });
 });
-
-chrome.storage.onChanged.addListener((changed) => {
-    console.log('content', 'storage is changed', changed);
+addStoreListener((action) => {
+  console.log(action);
 });

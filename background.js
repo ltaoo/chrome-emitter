@@ -1,76 +1,44 @@
 console.log("here is background");
-/* popup invoke background methods */
-// function toPopup() {
-//   alert("to popup!");
-// }
 
-/* background receive message from popup */
-// chrome.runtime.onConnect.addListener((port) => {
-//   console.log("连接中------------", port);
-//   port.onMessage.addListener((msg) => {
-//     console.log("[receive message from popup??]: ", msg);
-//     port.postMessage("Hi popup??");
-//   });
-// });
-
-// let currentTab = null;
-// /* receive message from content or popup or options? */
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//   const { to, type, payload } = request;
-//   console.log("[receive message from content??]: ", request, sender);
-//   // report message
-//   if (type === "saveCurrentTab") {
-//     console.log('background', 'save reference');
-//     currentTab = payload;
-//   }
-//   if (type === "test") {
-//     sendResponse("reply message from popup through content");
-//     return;
-//   }
-//   if (to === "content") {
-//     sendMessageToContent(request);
-//     sendResponse();
-//     return;
-//   }
-//   sendResponse("hello content");
-//   return true;
-// });
-
-// function sendMessageToContent(action) {
-//   // const views;
-//   // const views = chrome.extension.getViews();
-//   // console.log(views);
-//   console.log(currentTab);
-//   if (currentTab === null) {
-//     //
-//     console.log(
-//       "[background]",
-//       "not save currentTab, please open option page from popup"
-//     );
-//     return;
-//   }
-
-//   chrome.tabs.sendMessage(
-//     currentTab.id,
-//     { msg: "hello content" },
-//     (response) => {
-//       console.log("background", "[receive reply from content]: ", response);
-//     }
-//   );
-// }
-// setTimeout(() => {
-//   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-//     chrome.tabs.sendMessage(tabs[0].id, { msg: 'hello content' }, (response) => {
-//       console.log('background', '[receive reply from content]: ', response);
-//     });
-//   });
-//   // chrome.runtime.sendMessage({
-//   //   to: 'content',
-//   // }, (data) => {
-//   //   console.log('background', 'reply from content?', data);
-//   // });
-// }, 5000);
-
-// chrome.storage.onChanged.addListener(() => {
-//     console.log('background', 'storage is changed');
-// });
+const CUSTOM_EVENT_NAME = 'abc';
+function dispatch(action) {
+  window.dispatchEvent(
+    new CustomEvent(CUSTOM_EVENT_NAME, {
+      detail: action,
+    })
+  );
+  if (chrome === undefined || chrome.storage === undefined) {
+    return;
+  }
+  chrome.storage.local.set({
+    __time__: new Date().valueOf(),
+    __data__: {
+      value: new Date().valueOf(),
+      type: action.type,
+      payload: action.payload,
+    },
+  });
+}
+window.dispatch = dispatch;
+function addStoreListener(cb) {
+  window.addEventListener(CUSTOM_EVENT_NAME, function (event) {
+    cb(event.detail);
+  });
+  if (chrome === undefined || chrome.storage === undefined) {
+    return;
+  }
+  chrome.storage.onChanged.addListener((changes) => {
+    const { __data__ } = changes;
+    const nextAction = __data__.newValue;
+    const { type, payload } = nextAction;
+    cb({
+      type,
+      payload,
+    });
+  });
+}
+window.addStoreListener = addStoreListener;
+console.log(window);
+addStoreListener((action) => {
+  console.log(action);
+});

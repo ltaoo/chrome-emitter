@@ -1,5 +1,3 @@
-
-/* ----- common chunk start ----- */
 const CUSTOM_EVENT_NAME = "abc";
 const SPECIAL_CUSTOM_EVENT_NAME = "abcd";
 function dispatch(action) {
@@ -7,8 +5,9 @@ function dispatch(action) {
   if (chrome && chrome.extension) {
     eventName = CUSTOM_EVENT_NAME;
   }
+  console.log("[injected script]", "dispatch", action, eventName);
   window.dispatchEvent(
-    new CustomEvent(CUSTOM_EVENT_NAME, {
+    new CustomEvent(eventName, {
       detail: action,
     })
   );
@@ -43,7 +42,9 @@ function addStoreListener(cb) {
   });
 }
 window.addStoreListener = addStoreListener;
-window.addEventListener(SPECIAL_CUSTOM_EVENT_NAME, function (event) {
-  dispatch(event.detail);
+
+console.log("[injected script]", window.loadJs);
+
+addStoreListener((action) => {
+  console.log("i am injected script", action);
 });
-/* ----- common chunk end ----- */
