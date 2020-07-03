@@ -1,35 +1,76 @@
-console.log('here is background');
+console.log("here is background");
 /* popup invoke background methods */
-function toPopup() {
-  alert("to popup!");
-}
+// function toPopup() {
+//   alert("to popup!");
+// }
 
 /* background receive message from popup */
-// 获取所有 tab
-// const popups =
-//   chrome.extension.getViews({
-//     type: "popup",
-//   }) || [];
-// // 输出第一个使用插件页面的url
-// if (popups.length) {
-//   console.log(popups[0].location.href);
-// }
-/* background receive message from popup and operate popup page DOM */
-// 使用长连接 - 监听 popup 传递来的消息
 // chrome.runtime.onConnect.addListener((port) => {
-//   console.log("连接中------------");
+//   console.log("连接中------------", port);
 //   port.onMessage.addListener((msg) => {
-//     console.log("[receive message from popup]: ", msg);
-//     // getAll();
-//     port.postMessage("Hi popup");
+//     console.log("[receive message from popup??]: ", msg);
+//     port.postMessage("Hi popup??");
 //   });
 // });
-// 获取所有 tab
-function getAll() {
-  const views = chrome.extension.getViews({
-    type: "popup",
-  });
-  for (let o of views) {
-    o.document.getElementById("pbText").innerHTML = "万圣节🎃快乐";
-  }
-}
+
+// let currentTab = null;
+// /* receive message from content or popup or options? */
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//   const { to, type, payload } = request;
+//   console.log("[receive message from content??]: ", request, sender);
+//   // report message
+//   if (type === "saveCurrentTab") {
+//     console.log('background', 'save reference');
+//     currentTab = payload;
+//   }
+//   if (type === "test") {
+//     sendResponse("reply message from popup through content");
+//     return;
+//   }
+//   if (to === "content") {
+//     sendMessageToContent(request);
+//     sendResponse();
+//     return;
+//   }
+//   sendResponse("hello content");
+//   return true;
+// });
+
+// function sendMessageToContent(action) {
+//   // const views;
+//   // const views = chrome.extension.getViews();
+//   // console.log(views);
+//   console.log(currentTab);
+//   if (currentTab === null) {
+//     //
+//     console.log(
+//       "[background]",
+//       "not save currentTab, please open option page from popup"
+//     );
+//     return;
+//   }
+
+//   chrome.tabs.sendMessage(
+//     currentTab.id,
+//     { msg: "hello content" },
+//     (response) => {
+//       console.log("background", "[receive reply from content]: ", response);
+//     }
+//   );
+// }
+// setTimeout(() => {
+//   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//     chrome.tabs.sendMessage(tabs[0].id, { msg: 'hello content' }, (response) => {
+//       console.log('background', '[receive reply from content]: ', response);
+//     });
+//   });
+//   // chrome.runtime.sendMessage({
+//   //   to: 'content',
+//   // }, (data) => {
+//   //   console.log('background', 'reply from content?', data);
+//   // });
+// }, 5000);
+
+// chrome.storage.onChanged.addListener(() => {
+//     console.log('background', 'storage is changed');
+// });
