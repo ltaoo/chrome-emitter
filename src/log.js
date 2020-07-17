@@ -1,6 +1,6 @@
 import checker from "./checker";
 
-const DEBUGGER = process.env.NODE_ENV === 'development';
+const DEBUGGER = ENV === 'development';
 
 const { getCurrentScriptName } = checker;
 

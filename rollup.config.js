@@ -1,6 +1,7 @@
 import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel';
 import { uglify } from 'rollup-plugin-uglify';
+import replace from 'rollup-plugin-replace';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -19,6 +20,9 @@ export default {
     }),
     babel({
       exclude: 'node_modules/**',
+    }),
+    replace({
+      ENV: JSON.stringify(process.env.NODE_ENV),
     }),
     isProduction && uglify(),
   ],
