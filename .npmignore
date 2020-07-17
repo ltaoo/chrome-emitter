@@ -1,9 +1,15 @@
 .DS_Store
-node_modules
 
+# code
 rollup.config.js
+node_modules
 src
-
-yarn.lock
-*.log
+# config
 .gitignore
+.editorconfig
+.babelrc
+
+# generate auto
+yarn.lock
+package-lcok.json
+*.log

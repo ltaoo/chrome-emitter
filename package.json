@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "homepage": "https://github.com/ltaoo/chrome-emitter",
+  "bugs": "https://github.com/ltaoo/chrome-emitter/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ltaoo/chrome-emitter"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development rollup -c rollup.config.js --watch",
-    "build": "cross-env NODE_ENV=production rollup -c rollup.config.js"
+    "build": "cross-env NODE_ENV=production rollup -c rollup.config.js",
+    "clean": "rimraf dist",
+    "prepublish": "npm run build",
+    "postpublish": "npm run clean"
   },
   "keywords": [],
   "author": "",
