@@ -1,6 +1,6 @@
 # chrome-emitter
 
-一个简单的 `chrome` 通信方式。
+在 `chrome extension` 中使用的，一个简单的脚本间通信方式。
 
 ## Usage
 
@@ -20,4 +20,7 @@ emitter.emit('reload');
 
 ## Example
 
+[chrome-emitter-example](https://github.com/ltaoo/chrome-emitter-example)
+
+该示例展示了如何进行脚本间通信，以及一个截图的示例。
 
